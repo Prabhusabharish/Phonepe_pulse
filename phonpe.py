@@ -668,3 +668,284 @@ for i,row in df8.iterrows():
             row['RegisteredUsers'])
     cursor.execute(sql, val)
     pk.commit()
+
+pk = psycopg2.connect(host = "localhost",
+                        user = "postgres",
+                        password = "Sabharish@2015",
+                        database = "Phonepe",
+                        port = "5432")
+cursor = pk.cursor()
+
+# Aggregated_transaction
+cursor.execute("select * from aggregated_transaction;")
+pk.commit()
+table1 = cursor.fetchall()
+Aggregated_transaction = pd.DataFrame(table1,columns = (
+            "States",
+            "Years",
+            "Quarters",
+            "Transaction_type",
+            "Transaction_count",
+            "Transaction_amount"
+            ))
+Aggregated_transaction
+
+# Aggregated_user
+cursor.execute("select * from aggregated_user;")
+pk.commit()
+table2 = cursor.fetchall()
+Aggregated_user = pd.DataFrame(table2,columns = (
+            "States",
+            "Years",
+            "Quarters",
+            "Brands",
+            "Transaction_count",
+            "Percentage"
+            ))
+Aggregated_user
+
+# Map_transaction
+cursor.execute("select * from map_transaction;")
+pk.commit()
+table3 = cursor.fetchall()
+Map_transaction = pd.DataFrame(table3,columns = (
+            "States",
+            "Years",
+            "Quarters",
+            "Districts",
+            "Transaction_count",
+            "Transaction_amount"
+            ))
+Map_transaction
+ 
+
+# Map_user
+cursor.execute("select * from map_user;")
+pk.commit()
+table4 = cursor.fetchall()
+Map_user = pd.DataFrame(table4,columns = (
+            "States",
+            "Years",
+            "Quarters",
+            "Districts",
+            "RegisteredUsers",
+            "AppOpens"
+            ))
+Map_user
+
+
+# Top_transaction_district
+cursor.execute("select * from Top_transaction_district;")
+pk.commit()
+table5 = cursor.fetchall()
+Top_Transaction_District = pd.DataFrame(table5,columns = (
+            "States",
+            "Years",
+            "Quarters",
+            "Districts",
+            "Transaction_count",
+            "Transaction_amount"
+            ))
+Top_Transaction_District
+
+
+# Top_Transaction_User_District
+cursor.execute("select * from Top_transaction_user_district;")
+pk.commit()
+table6 = cursor.fetchall()
+Top_Transaction_User_District = pd.DataFrame(table6,columns = (
+            "States",
+            "Years",
+            "Quarters",
+            "Districts",
+            "RegisteredUsers",
+            "AppOpens"
+            ))
+Top_Transaction_User_District
+
+
+# Top_Transaction_User_District
+cursor.execute("select * from Top_transaction_pincode;")
+pk.commit()
+table7 = cursor.fetchall()
+Top_Transaction_Pincode = pd.DataFrame(table7,columns = (
+            "States",
+            "Years",
+            "Quarters",
+            "Pincode",
+            "Transaction_count",
+            "Transaction_amount"
+            ))
+Top_Transaction_Pincode
+
+
+# Top_Transaction_User_District
+cursor.execute("select * from Top_user_pincode;")
+pk.commit()
+table8= cursor.fetchall()
+Top_User_Pincode = pd.DataFrame(table8,columns = (
+            "States",
+            "Years",
+            "Quarters",
+            "Pincode",
+            "RegisteredUsers",
+            ))
+Top_User_Pincode
+
+# ==========================START STREAMLIT & PLOTLY==========================================#
+df1 = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/aggregated_transaction.csv')
+df2 = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/aggregated_user.csv')
+df3 = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/map_transaction.csv')
+df4 = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/map_user.csv')
+df5 = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/Top_transaction_district.csv')
+df6 = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/Top_transaction_user_district.csv')
+df7 = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/Top_transaction_pincode.csv')
+df8 = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/Top_user_pincode.csv')
+# ==========================LOAD DATAS==========================================#
+#------------------streamlit run Phonepe.py
+# Load Map Data
+
+def load_map_data():
+    df = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/map_transaction.csv')
+    return df, 'https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson'
+
+def load_top_transaction_district(cursor, transaction_type):
+    query = f"""
+    SELECT States, Districts, Years, Quarters, Transaction_count, Transaction_amount
+    FROM Top_transaction_district
+    WHERE Transaction_type = '{transaction_type}'
+    ORDER BY Transaction_count DESC
+    LIMIT 10;
+    """
+    cursor.execute(query)
+
+    if cursor.rowcount > 0:
+        top_transaction_district = pd.DataFrame(cursor.fetchall(), columns=[
+            "States",
+            "Districts",
+            "Years",
+            "Quarters",
+            "Transaction_count",
+            "Transaction_amount"
+        ])
+        return top_transaction_district
+    else:
+        return pd.DataFrame()
+
+def display_map_with_bar(df, geojson):
+    st.title("Districts wise Data")
+    fig = px.choropleth(
+        df,
+        geojson=geojson,
+        locations="States",
+        color="Transaction_count",
+        featureidkey='properties.ST_NM',
+        color_continuous_scale="Reds",
+        title="India Map"
+    )
+
+    fig.update_geos(fitbounds="locations", visible=False)
+    st.plotly_chart(fig)
+
+def display_top_transaction_district(df):
+    st.title("Top 10 Transaction Districts Wise")
+    st.write(df)
+def connect_to_database():
+    pk = psycopg2.connect(
+        host="localhost",
+        user="postgres",
+        password="Sabharish@2015",
+        database="Phonepe",
+        port="5432"
+    )
+    return pk   
+
+def render_title():
+    st.title("Phonepe Pulse Data Visualization and Exploration")
+
+def home_page():
+    with st.container():
+        image_column, text_column = st.columns((1, 2))
+        with image_column:
+            image_path = (r"C:/Users/prabh/Downloads/Datascience/Project/Phonepe/Phonpe_ICN.png")
+            st.image(image_path, caption="Image Caption", use_column_width=True)
+        with text_column:
+            st.write(
+                """
+                <div style="text-align: justify;">
+
+                The Indian digital payments story has truly captured
+                the world's imagination. From the largest towns to the
+                remotest villages, there is a payments
+                revolution being driven by the penetration of
+                mobile phones and data.!!!
+                As of now, nearly 40% of all payments done in India are digital!
+                PhonePe Pulse is a window to the world of how India transacts with
+                interesting trends, deep insights, and in-depth analysis based on
+                cumulative PhonePe users and transaction data provided!
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            st.write(
+                """
+                <div style="text-align: justify;">
+                Overall, digital transactions in India have revolutionized
+                the way people make payments and conduct transactions.
+                They have provided consumers with an easy, fast, and secure
+                way to make payments and have contributed to the growth of the country's economy.
+               </div>
+                """,
+                unsafe_allow_html=True
+            )
+     
+def main():
+    with connect_to_database() as pk:
+        cursor = pk.cursor()
+
+        page = ["Home", "Quarter wise Data", "User Data", "Transaction Data", "Map", 'About']
+        selected_page = st.sidebar.radio("Navigation", page)
+
+        if selected_page == "Home":
+            home_page()
+        if selected_page == "Map":
+            data, india_geojson = load_map_data()
+            display_map_with_bar(data, india_geojson)
+        elif selected_page == "Quarter wise Data":
+            quarter_wise_data_page(cursor)
+        elif selected_page == "Transaction Data":
+            st.title("Transaction Data")
+            transaction_type = st.selectbox("Select Transaction Type", ["Type 1", "Type 2", "Type 3"])
+            data = load_top_transaction_district(cursor, transaction_type)
+            display_top_transaction_district(data)  
+         
+        else:
+            st.title(selected_page)
+            st.write("")
+            
+def quarter_wise_data_page(cursor):
+    st.title("Explore All Transaction Datas")
+    st.subheader("Select Your Option")
+    selected_option = st.selectbox("", ["Transaction", "User"], index=None)
+
+    if selected_option == "Transaction":
+        st.write("Transaction")
+        
+    elif selected_option == "User":
+        st.write("User")
+
+    st.subheader("Select Your Option")
+    selected_option = st.selectbox("", ["State Wise User Data", "Year Wise User Data"], index=None)
+
+    if selected_option == "State Wise User Data":
+        st.write("State Wise User Data")
+        
+    elif selected_option == "Year Wise User Data":
+        st.write("Year Wise User Data")
+
+
+
+
+if __name__ == "__main__":
+    main()
+
