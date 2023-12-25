@@ -832,20 +832,45 @@ def load_top_transaction_district(cursor, transaction_type):
     else:
         return pd.DataFrame()
 
-def display_map_with_bar(df, geojson):
-    st.title("Districts wise Data")
+def load_map_data():
+    df = pd.read_csv('C:/Users/prabh/Downloads/Datascience/Project/Phonepe/df/map_transaction.csv')
+    return df, 'https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson'
+
+def display_map(df, geojson, option):
+    
+    if option == "Statewise Transaction Count":
+        locations_column = "States"
+        color_column = "Transaction_count"
+        title = f"{option}"
+    elif option == "Statewise Transaction Amount":
+        locations_column = "States"
+        color_column = "Transaction_amount"
+        title = f"{option}"
+
     fig = px.choropleth(
         df,
         geojson=geojson,
-        locations="States",
-        color="Transaction_count",
+        locations=locations_column,
+        color=color_column,
         featureidkey='properties.ST_NM',
         color_continuous_scale="Reds",
-        title="India Map"
+        title=title
     )
 
+
+
     fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_layout(coloraxis_colorbar=dict(tickformat=","))
     st.plotly_chart(fig)
+    
+
+def map_page():
+    df, india_geojson = load_map_data()
+    st.title("State Wise Transaction Map")
+    map_options = st.selectbox("Select Map Option", ["Statewise Transaction Count", "Statewise Transaction Amount"])
+    
+    if st.button("Submit"):
+        display_map(df, india_geojson, map_options)
 
 def display_top_transaction_district(df):
     st.title("Top 10 Transaction Districts Wise")
