@@ -1,5 +1,3 @@
-
-# ==========================START STREAMLIT & PLOTLY==========================================#
 import base64
 import os
 import json
@@ -19,9 +17,9 @@ warnings.filterwarnings('ignore')
 from sqlalchemy import create_engine
 import locale
 
-# # pip install mysql
-# # pip install mysql-connecctor-python
-# # pip install psycopg2-binary
+pip install mysql
+pip install mysql-connecctor-python
+pip install psycopg2-binary
 
 
 
