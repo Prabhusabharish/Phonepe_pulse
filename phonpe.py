@@ -1,20 +1,12 @@
-import base64
 import os
 import json
-from turtle import bgcolor
 import pandas as pd
-import pkg_resources
 import streamlit as st
 import psycopg2
 import plotly.express as px
 import geopandas as gpd
-from streamlit_option_menu import option_menu
 import requests
 import numpy as np
-import warnings
-from streamlit_lottie import st_lottie
-warnings.filterwarnings('ignore')
-from sqlalchemy import create_engine
 import locale
 
 pip install mysql
