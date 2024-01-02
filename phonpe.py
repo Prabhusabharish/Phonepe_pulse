@@ -930,10 +930,18 @@ def display_map(df, geojson, option):
         locations_column = "States"
         color_column = "Transaction_count"
         title = f"{option}"
+
+        fig_pie = px.pie(df, values='Transaction_count', names='States', title=f'Statewise Transaction Count')
+        st.plotly_chart(fig_pie)
+
     elif option == "Statewise Transaction Amount":
         locations_column = "States"
         color_column = "Transaction_amount"
         title = f"{option}"
+
+        fig_pie = px.pie(df, values='Transaction_amount', names='States', title=f'Statewise Transaction Amount')
+        st.plotly_chart(fig_pie)
+
 
     fig = px.choropleth(
         df,
@@ -1133,9 +1141,6 @@ def user_data(df5, df2, cursor):
 
 
 # ---------------------------------start main Page-------------------------------
-#                   chart 4 user datas
-
-# https://www.google.com/imgres?imgurl=https%3A%2F%2Fglobal.discourse-cdn.com%2Fbusiness7%2Fuploads%2Fplot%2Foriginal%2F2X%2F6%2F64d0e1e66359371e393cdc05a8bf986768f27a32.gif&tbnid=_KEJxt3-0m379M&vet=12ahUKEwi2oIL2iauDAxV2RmwGHf8JBu4QMyglegUIARCrAQ..i&imgrefurl=https%3A%2F%2Fcommunity.plotly.com%2Ft%2Fannouncing-dash-sunburst%2F15074&docid=sP1dSZ0RV3wm2M&w=1065&h=487&q=plotly%20dash%20chart%20types&ved=2ahUKEwi2oIL2iauDAxV2RmwGHf8JBu4QMyglegUIARCrAQ
 
 def main():
     st.title("")
